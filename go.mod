@@ -1,4 +1,4 @@
-module github.com/x/y
+module github.com/frezik/vgdb
 
 go 1.21
 
