@@ -47,5 +47,5 @@ func main() {
         }
     })
 
-    c.Visit( "https://en.wikipedia.org/wiki/List_of_Nintendo_Entertainment_System_games" )
+    c.Visit( "https://en.wikipedia.org/wiki/List_of_Super_Nintendo_Entertainment_System_games" )
 }
