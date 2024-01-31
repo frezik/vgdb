@@ -1,0 +1,62 @@
+openapi: 3.1.0
+info:
+  title: Video Game Database
+  description: |-
+    Query information about video game releases
+  version: "1"
+
+servers:
+  - url: https://vgdb.wumpus-cave.net/api/
+
+paths:
+  /:
+    get:
+      summary: Heartbeat check
+      description: Heartbeat check
+      responses:
+        '200':
+          description: Success
+        '500':
+          description: Server error
+  /systems:
+    get:
+      summary: List of systems
+      description: A list of systems in our database, e.g. "nes", "snes", etc.
+      responses:
+        '200':
+          description: Returns a list of systems
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SystemList"
+  /{system}/games:
+    get:
+      summary: List of games for a given system
+      description: A list of all games for the given system, e.g. "nes", "snes", "sega master", etc.
+      parameters:
+      - name: system
+        in: path
+        description: Name of system
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Returns a list of games
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameList"
+
+components: 
+  schemas:
+    GameList:
+      type: array 
+      properties:
+        schemas:
+          type: string
+    SystemList:
+      type: array 
+      properties:
+        schemas:
+          type: string
