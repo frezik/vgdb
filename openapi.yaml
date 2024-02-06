@@ -56,7 +56,9 @@ components:
         schemas:
           type: string
     SystemList:
-      type: array 
+      type: object
       properties:
-        schemas:
-          type: string
+        systems:
+          type: array
+          items:
+            type: string
