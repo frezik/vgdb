@@ -14,17 +14,14 @@ var ts = httptest.NewServer( chi_router )
 
 
 func TestHealthEndpoint( t *testing.T ) {
-    req, err := http.NewRequest( "GET", "/", nil )
+    req, err := http.NewRequest( "GET", ts.URL + "/", nil )
 
     if err != nil {
         t.Errorf( "Error creating new request: %v", err )
     }
 
-    rr := httptest.NewRecorder()
-    handler := http.HandlerFunc( router.HeartBeat )
-    handler.ServeHTTP( rr, req )
-
-    if status := rr.Code; status != http.StatusOK {
+    response, err := http.DefaultClient.Do( req )
+    if status := response.StatusCode; status != http.StatusOK {
         t.Errorf( "Handler returned wrong status code. Expected: %d, got: %d",
             http.StatusOK, status )
     }
