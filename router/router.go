@@ -9,7 +9,13 @@ import (
 
     "github.com/go-chi/chi/v5"
     "github.com/go-chi/chi/v5/middleware"
+    "github.com/redis/go-redis/v9"
 )
+
+const REDIS_ADDR = "localhost:6379"
+const REDIS_PASSWD = ""
+const REDIS_DB = 0
+
 
 const data_dir = "data"
 var data_files = map[string]string{
@@ -28,6 +34,14 @@ type SystemData struct {
     EURelease string
     BRRelease string
 }
+
+var redis_client = redis.NewClient( &redis.Options{
+    Addr: REDIS_ADDR,
+    Password: REDIS_PASSWD,
+    DB: REDIS_DB,
+})
+
+
 
 
 func Routes() *chi.Mux {
