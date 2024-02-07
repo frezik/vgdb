@@ -72,4 +72,9 @@ func TestGamesEndpoint( t *testing.T ) {
     if err := json.NewDecoder( response.Body ).Decode( &games ); err != nil {
         t.Errorf( "Error decoding response body: %v", err )
     }
+
+    first_game := games[ "games" ][0]
+    if first_game != "'89 Dennou Kyuusei Uranai" {
+        t.Errorf( "Expected different first game, got: " + first_game )
+    }
 }
