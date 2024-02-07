@@ -45,7 +45,7 @@ func TestSystemsEndpoint( t *testing.T ) {
     }
 }
 
-func TestGamesEndpoint( t *testing.T ) {
+func TestSystemGamesEndpoint( t *testing.T ) {
     req, err := http.NewRequest( "GET", ts.URL + "/snes/games", nil )
     if err != nil {
         t.Errorf( "Error creating new request: %v", err )
