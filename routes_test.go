@@ -6,7 +6,7 @@ import (
     "net/http/httptest"
     "testing"
 
-    "github.com/frezik/vgdb/router"
+    router "github.com/frezik/vgdb/router"
 )
 
 func TestHealthEndpoint( t *testing.T ) {
@@ -44,6 +44,32 @@ func TestSystemsEndpoint( t *testing.T ) {
 
     systems := make( map[string][]string )
     if err := json.NewDecoder( rr.Body ).Decode( &systems ); err != nil {
+        t.Errorf( "Error decoding response body: %v", err )
+    }
+}
+
+func TestGamesEndpoint( t *testing.T ) {
+    chi_router := router.Routes()
+    ts := httptest.NewServer( chi_router )
+    defer ts.Close()
+
+    req, err := http.NewRequest( "GET", ts.URL + "/snes/games", nil )
+    if err != nil {
+        t.Errorf( "Error creating new request: %v", err )
+    }
+
+    response, err := http.DefaultClient.Do( req )
+    if err != nil {
+        t.Fatal( err )
+    }
+
+    if status := response.StatusCode; status != http.StatusOK {
+        t.Errorf( "Handler returned wrong status code. Expected: %d, got: %d",
+            http.StatusOK, status )
+    }
+
+    games := make( map[string][]string )
+    if err := json.NewDecoder( response.Body ).Decode( &games ); err != nil {
         t.Errorf( "Error decoding response body: %v", err )
     }
 }

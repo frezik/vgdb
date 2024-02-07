@@ -51,10 +51,12 @@ paths:
 components: 
   schemas:
     GameList:
-      type: array 
+      type: object
       properties:
-        schemas:
-          type: string
+        games:
+          type: array
+          items:
+            type: string
     SystemList:
       type: object
       properties:
