@@ -1,6 +1,7 @@
 package router
 
 import (
+    "context"
     "encoding/json"
     "log"
     "net/http"
@@ -98,23 +99,40 @@ func ListSystemGames(
         return
     }
 
-    system_data, err := GetSystemData( system_data_file )
-    if err != nil {
-        http.Error( w, "Internal error", http.StatusInternalServerError )
-        log.Println( err )
-        return
-    }
+    ctx := context.Background()
+    redis_key := "system-games-" + system + ":1"
+    games := redis_client.LRange( ctx, redis_key, 0, -1 ).Val()
 
-    games := make( []string, len( system_data ) )
-    for k := range system_data {
-        games[k] = system_data[k].Name
+    if len(games) == 0 {
+        log.Printf( "Did not fetch system from cache, getting from file" )
+
+        system_data, err := GetSystemData( system_data_file )
+        if err != nil {
+            http.Error( w, "Internal error", http.StatusInternalServerError )
+            log.Println( err )
+            return
+        }
+
+        games = make( []string, len( system_data ) )
+        for k := range system_data {
+            games[k] = system_data[k].Name
+        }
+
+        err = redis_client.RPush( ctx, redis_key, games ).Err()
+        if err != nil {
+            log.Printf( "Error setting redis key: %v\n", err )
+            // Can still continue since we have the data from outside 
+            // the cache
+        }
+    } else {
+        log.Printf( "Fetched system from cache" )
     }
 
     output := map[string][]string {
         "games": games,
     }
 
-    err = json.NewEncoder( w ).Encode( output )
+    err := json.NewEncoder( w ).Encode( output )
     if err != nil {
         http.Error( w, "Internal error", http.StatusInternalServerError )
         log.Println( err )
