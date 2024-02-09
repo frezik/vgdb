@@ -11,6 +11,8 @@ import (
     "github.com/go-chi/chi/v5"
     "github.com/go-chi/chi/v5/middleware"
     "github.com/redis/go-redis/v9"
+
+    "github.com/frezik/vgdb/lib"
 )
 
 const REDIS_ADDR = "localhost:6379"
@@ -67,24 +69,14 @@ func ListSystems(
     w http.ResponseWriter,
     r *http.Request,
 ) {
-    systems := make( []string, len( data_files ) )
-
-    i := 0
-    for k := range data_files {
-        systems[i] = k
-        i++
-    }
-
-    output := map[string][]string {
-        "systems": systems,
-    }
-
-    err := json.NewEncoder( w ).Encode( output )
-    if err != nil {
-        http.Error( w, "Internal error", http.StatusInternalServerError )
-        log.Println( err )
-        return
-    }
+    write_func := reduce.WriteJsonOutput( w, reduce.EndFunc() )
+    encode_func := reduce.EncodeSystemsOutput( write_func )
+    systems_list_func := reduce.SystemsListFromDataFiles(
+        data_files,
+        encode_func,
+    )
+    
+    systems_list_func()
 }
 
 func ListSystemGames(
