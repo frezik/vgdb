@@ -12,7 +12,7 @@ import (
     "github.com/go-chi/chi/v5/middleware"
     "github.com/redis/go-redis/v9"
 
-    "github.com/frezik/vgdb/lib"
+    "github.com/frezik/vgdb/reduce"
 )
 
 const REDIS_ADDR = "localhost:6379"
