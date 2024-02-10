@@ -12,7 +12,7 @@ import (
     "github.com/go-chi/chi/v5/middleware"
     "github.com/redis/go-redis/v9"
 
-    "github.com/frezik/vgdb/reduce"
+    "github.com/frezik/vgdb/util"
 )
 
 const REDIS_ADDR = "localhost:6379"
@@ -69,14 +69,9 @@ func ListSystems(
     w http.ResponseWriter,
     r *http.Request,
 ) {
-    write_func := reduce.WriteJsonOutput( w, reduce.EndFunc() )
-    encode_func := reduce.EncodeSystemsOutput( write_func )
-    systems_list_func := reduce.SystemsListFromDataFiles(
-        data_files,
-        encode_func,
-    )
-    
-    systems_list_func()
+    systems_list := util.SystemsListFromDataFiles( data_files )
+    formatted_systems_list := util.FormatSystemsOutput( systems_list )
+    util.WriteJsonOutput( w, formatted_systems_list )
 }
 
 func ListSystemGames(
