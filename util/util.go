@@ -4,7 +4,23 @@ import (
     "encoding/json"
     "log"
     "net/http"
+    "os"
+    "path/filepath"
 )
+
+
+const data_dir = "data"
+
+
+type SystemData struct {
+    Name string
+    Publisher string
+    FirstRelease string
+    JPRelease string
+    NARelease string
+    EURelease string
+    BRRelease string
+}
 
 
 func SystemsListFromDataFiles(
@@ -40,4 +56,22 @@ func WriteJsonOutput(
         log.Println( err )
         return
     }
+}
+
+func GetSystemData(
+    data_file string,
+) ([]SystemData, error) {
+    file_path := filepath.Join( data_dir, data_file )
+    data, err := os.ReadFile( file_path )
+    if err != nil {
+        return nil, err
+    }
+
+    var system_data []SystemData
+    err = json.Unmarshal( data, &system_data )
+    if err != nil {
+        return nil, err
+    }
+
+    return system_data, nil
 }

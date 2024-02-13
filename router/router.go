@@ -5,8 +5,6 @@ import (
     "encoding/json"
     "log"
     "net/http"
-    "os"
-    "path/filepath"
 
     "github.com/go-chi/chi/v5"
     "github.com/go-chi/chi/v5/middleware"
@@ -20,7 +18,6 @@ const REDIS_PASSWD = ""
 const REDIS_DB = 0
 
 
-const data_dir = "data"
 var data_files = map[string]string{
     "nes": "nes.json",
     "snes": "snes.json",
@@ -28,23 +25,11 @@ var data_files = map[string]string{
     "sega_master": "sega_master.json",
 }
 
-type SystemData struct {
-    Name string
-    Publisher string
-    FirstRelease string
-    JPRelease string
-    NARelease string
-    EURelease string
-    BRRelease string
-}
-
 var redis_client = redis.NewClient( &redis.Options{
     Addr: REDIS_ADDR,
     Password: REDIS_PASSWD,
     DB: REDIS_DB,
 })
-
-
 
 
 func Routes() *chi.Mux {
@@ -93,7 +78,7 @@ func ListSystemGames(
     if len(games) == 0 {
         log.Printf( "Did not fetch system from cache, getting from file" )
 
-        system_data, err := GetSystemData( system_data_file )
+        system_data, err := util.GetSystemData( system_data_file )
         if err != nil {
             http.Error( w, "Internal error", http.StatusInternalServerError )
             log.Println( err )
@@ -125,22 +110,4 @@ func ListSystemGames(
         log.Println( err )
         return
     }
-}
-
-func GetSystemData(
-    data_file string,
-) ([]SystemData, error) {
-    file_path := filepath.Join( data_dir, data_file )
-    data, err := os.ReadFile( file_path )
-    if err != nil {
-        return nil, err
-    }
-
-    var system_data []SystemData
-    err = json.Unmarshal( data, &system_data )
-    if err != nil {
-        return nil, err
-    }
-
-    return system_data, nil
 }
