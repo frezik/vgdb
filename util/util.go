@@ -1,11 +1,14 @@
 package util
 
 import (
+    "context"
     "encoding/json"
     "log"
     "net/http"
     "os"
     "path/filepath"
+
+    "github.com/redis/go-redis/v9"
 )
 
 
@@ -16,6 +19,17 @@ var data_files = map[string]string{
     "sega_genesis": "sega_genesis.json",
     "sega_master": "sega_master.json",
 }
+
+
+const REDIS_ADDR = "localhost:6379"
+const REDIS_PASSWD = ""
+const REDIS_DB = 0
+
+var redis_client = redis.NewClient( &redis.Options{
+    Addr: REDIS_ADDR,
+    Password: REDIS_PASSWD,
+    DB: REDIS_DB,
+})
 
 
 type SystemData struct {
@@ -84,4 +98,23 @@ func GetSystemData(
     }
 
     return system_data, nil
+}
+
+func FetchGamesFromRedis(
+    system string,
+) []string {
+    ctx := context.Background()
+    redis_key := "system-games-" + system + ":1"
+    games := redis_client.LRange( ctx, redis_key, 0, -1 ).Val()
+    return games
+}
+
+func SetGamesOnRedis(
+    games []string,
+    system string,
+) error {
+    ctx := context.Background()
+    redis_key := "system-games-" + system + ":1"
+    err := redis_client.RPush( ctx, redis_key, games ).Err()
+    return err
 }

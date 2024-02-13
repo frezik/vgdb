@@ -1,28 +1,15 @@
 package router
 
 import (
-    "context"
     "encoding/json"
     "log"
     "net/http"
 
     "github.com/go-chi/chi/v5"
     "github.com/go-chi/chi/v5/middleware"
-    "github.com/redis/go-redis/v9"
 
     "github.com/frezik/vgdb/util"
 )
-
-const REDIS_ADDR = "localhost:6379"
-const REDIS_PASSWD = ""
-const REDIS_DB = 0
-
-
-var redis_client = redis.NewClient( &redis.Options{
-    Addr: REDIS_ADDR,
-    Password: REDIS_PASSWD,
-    DB: REDIS_DB,
-})
 
 
 func Routes() *chi.Mux {
@@ -65,9 +52,7 @@ func ListSystemGames(
         return
     }
 
-    ctx := context.Background()
-    redis_key := "system-games-" + system + ":1"
-    games := redis_client.LRange( ctx, redis_key, 0, -1 ).Val()
+    games := util.FetchGamesFromRedis( system )
 
     if len(games) == 0 {
         log.Printf( "Did not fetch system from cache, getting from file" )
@@ -84,7 +69,7 @@ func ListSystemGames(
             games[k] = system_data[k].Name
         }
 
-        err = redis_client.RPush( ctx, redis_key, games ).Err()
+        err = util.SetGamesOnRedis( games, system )
         if err != nil {
             log.Printf( "Error setting redis key: %v\n", err )
             // Can still continue since we have the data from outside 
