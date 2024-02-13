@@ -78,9 +78,6 @@ func ListSystemGames(
         log.Printf( "Fetched system from cache" )
     }
 
-    output := map[string][]string {
-        "games": games,
-    }
-
+    output := util.FormatGamesList( games )
     util.WriteJsonOutput( w, output )
 }

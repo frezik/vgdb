@@ -70,6 +70,15 @@ func FormatSystemsOutput(
     return output
 }
 
+func FormatGamesList(
+    games []string,
+) map[string][]string {
+    output := map[string][]string {
+        "games": games,
+    }
+    return output
+}
+
 func WriteJsonOutput(
     w http.ResponseWriter,
     output map[string][]string,
