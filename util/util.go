@@ -10,6 +10,12 @@ import (
 
 
 const data_dir = "data"
+var data_files = map[string]string{
+    "nes": "nes.json",
+    "snes": "snes.json",
+    "sega_genesis": "sega_genesis.json",
+    "sega_master": "sega_master.json",
+}
 
 
 type SystemData struct {
@@ -22,6 +28,10 @@ type SystemData struct {
     BRRelease string
 }
 
+
+func DataFiles() map[string]string {
+    return data_files
+}
 
 func SystemsListFromDataFiles(
     data_files map[string]string,

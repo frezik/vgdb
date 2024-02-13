@@ -18,13 +18,6 @@ const REDIS_PASSWD = ""
 const REDIS_DB = 0
 
 
-var data_files = map[string]string{
-    "nes": "nes.json",
-    "snes": "snes.json",
-    "sega_genesis": "sega_genesis.json",
-    "sega_master": "sega_master.json",
-}
-
 var redis_client = redis.NewClient( &redis.Options{
     Addr: REDIS_ADDR,
     Password: REDIS_PASSWD,
@@ -54,7 +47,7 @@ func ListSystems(
     w http.ResponseWriter,
     r *http.Request,
 ) {
-    systems_list := util.SystemsListFromDataFiles( data_files )
+    systems_list := util.SystemsListFromDataFiles( util.DataFiles() )
     formatted_systems_list := util.FormatSystemsOutput( systems_list )
     util.WriteJsonOutput( w, formatted_systems_list )
 }
@@ -64,6 +57,7 @@ func ListSystemGames(
     r *http.Request,
 ) {
     system := chi.URLParam( r, "system" )
+    data_files := util.DataFiles()
     system_data_file, does_system_exist := data_files[ system ]
     if ! does_system_exist {
         http.Error( w, "System not found", http.StatusNotFound )
