@@ -93,7 +93,7 @@ func WriteJsonOutput(
 
 func GetSystemData(
     data_file string,
-) ([]SystemData, error) {
+) ([]string, error) {
     file_path := filepath.Join( data_dir, data_file )
     data, err := os.ReadFile( file_path )
     if err != nil {
@@ -106,7 +106,12 @@ func GetSystemData(
         return nil, err
     }
 
-    return system_data, nil
+    games := make( []string, len( system_data ) )
+    for k := range system_data {
+        games[k] = system_data[k].Name
+    }
+
+    return games, nil
 }
 
 func FetchGamesFromRedis(

@@ -56,16 +56,11 @@ func ListSystemGames(
     if len(games) == 0 {
         log.Printf( "Did not fetch system from cache, getting from file" )
 
-        system_data, err := util.GetSystemData( system_data_file )
+        games, err := util.GetSystemData( system_data_file )
         if err != nil {
             http.Error( w, "Internal error", http.StatusInternalServerError )
             log.Println( err )
             return
-        }
-
-        games = make( []string, len( system_data ) )
-        for k := range system_data {
-            games[k] = system_data[k].Name
         }
 
         err = util.SetGamesOnRedis( games, system )
