@@ -1,7 +1,6 @@
 package router
 
 import (
-    "encoding/json"
     "log"
     "net/http"
 
@@ -83,10 +82,5 @@ func ListSystemGames(
         "games": games,
     }
 
-    err := json.NewEncoder( w ).Encode( output )
-    if err != nil {
-        http.Error( w, "Internal error", http.StatusInternalServerError )
-        log.Println( err )
-        return
-    }
+    util.WriteJsonOutput( w, output )
 }
