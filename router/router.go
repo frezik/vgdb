@@ -1,3 +1,4 @@
+// Package router sets up and handles the chi routes.
 package router
 
 import (
@@ -11,6 +12,7 @@ import (
 )
 
 
+// Creates a chi router, sets up the paths on it, and returns the router.
 func Routes() *chi.Mux {
     r := chi.NewRouter()
     r.Use( middleware.Logger )
@@ -22,6 +24,7 @@ func Routes() *chi.Mux {
     return r
 }
 
+// A basic heart beat check to show if the endpoints are basically functional.
 func HeartBeat(
     w http.ResponseWriter,
     r *http.Request,
@@ -29,6 +32,7 @@ func HeartBeat(
     w.Write([]byte("OK"))
 }
 
+// Outputs a list of available systems.
 func ListSystems(
     w http.ResponseWriter,
     r *http.Request,
@@ -38,6 +42,7 @@ func ListSystems(
     util.WriteJsonOutput( w, formatted_systems_list )
 }
 
+// Given a system, outputs all games for it.
 func ListSystemGames(
     w http.ResponseWriter,
     r *http.Request,
@@ -56,7 +61,7 @@ func ListSystemGames(
     if len(games) == 0 {
         log.Printf( "Did not fetch system from cache, getting from file" )
 
-        games, err := util.GetSystemData( system_data_file )
+        games, err := util.GetGamesData( system_data_file )
         if err != nil {
             http.Error( w, "Internal error", http.StatusInternalServerError )
             log.Println( err )

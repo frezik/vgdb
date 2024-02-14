@@ -1,3 +1,4 @@
+// Package util provides most of the heavy lifting of getting and modifying data
 package util
 
 import (
@@ -12,7 +13,12 @@ import (
 )
 
 
+// Directory for holding the JSON files for each system. This is relative 
+// to the top level dir of the project. The files in data_files will be in 
+// this dir.
 const data_dir = "data"
+// Maps short system names (like "nes") to a JSON file that has the data for 
+// that system. The files are under data_dir.
 var data_files = map[string]string{
     "nes": "nes.json",
     "snes": "snes.json",
@@ -21,10 +27,14 @@ var data_files = map[string]string{
 }
 
 
+// Redis addr
 const REDIS_ADDR = "localhost:6379"
+// Redis pass
 const REDIS_PASSWD = ""
+// Redis DB num
 const REDIS_DB = 0
 
+// Connection to redis
 var redis_client = redis.NewClient( &redis.Options{
     Addr: REDIS_ADDR,
     Password: REDIS_PASSWD,
@@ -32,21 +42,27 @@ var redis_client = redis.NewClient( &redis.Options{
 })
 
 
+// SystemData holds information about a single game.
+//
+// All dates are in "Monthname YYYY" format, and can be null.
 type SystemData struct {
-    Name string
-    Publisher string
-    FirstRelease string
-    JPRelease string
-    NARelease string
-    EURelease string
-    BRRelease string
+    Name string // Name of game
+    Publisher string // Publisher
+    FirstRelease string // Date of first release in any territory
+    JPRelease string // Japan release date
+    NARelease string // North America release date
+    EURelease string // Europe release date
+    BRRelease string // Brazil release date
 }
 
 
+// Returns map of system names (like "nes") to data files in the data_dir
+// directory.
 func DataFiles() map[string]string {
     return data_files
 }
 
+// Transform the mapping of data files into a list of systems.
 func SystemsListFromDataFiles(
     data_files map[string]string,
 ) []string {
@@ -61,6 +77,8 @@ func SystemsListFromDataFiles(
     return systems
 }
 
+// Wraps a list of systems into a map with "output" as the single key holding 
+// the list.
 func FormatSystemsOutput(
     systems []string,
 ) map[string][]string {
@@ -70,6 +88,8 @@ func FormatSystemsOutput(
     return output
 }
 
+// Wraps a list of games into a map with "output" as the single key holding 
+// the list.
 func FormatGamesList(
     games []string,
 ) map[string][]string {
@@ -79,6 +99,7 @@ func FormatGamesList(
     return output
 }
 
+// Transforms the give output into JSON and writes it out.
 func WriteJsonOutput(
     w http.ResponseWriter,
     output map[string][]string,
@@ -91,7 +112,8 @@ func WriteJsonOutput(
     }
 }
 
-func GetSystemData(
+// From the given data_file path, returns all the games inside.
+func GetGamesData(
     data_file string,
 ) ([]string, error) {
     file_path := filepath.Join( data_dir, data_file )
@@ -114,6 +136,7 @@ func GetSystemData(
     return games, nil
 }
 
+// Gets the list of games from Redis
 func FetchGamesFromRedis(
     system string,
 ) []string {
@@ -123,6 +146,7 @@ func FetchGamesFromRedis(
     return games
 }
 
+// Sets the list of games to Redis
 func SetGamesOnRedis(
     games []string,
     system string,
